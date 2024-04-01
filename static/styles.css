@@ -1,0 +1,83 @@
+/* Reset styles */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+/* Global styles */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f8f9fa; /* Light gray background */
+    color: #212529; /* Dark font color */
+}
+
+.container {
+    max-width: 1200px; /* Set maximum container width */
+    margin: 0 auto; /* Center the container horizontally */
+    padding: 20px; /* Add some padding for content */
+}
+
+h1, h2, h3, h4, h5, h6 {
+    margin-bottom: 20px; /* Add bottom margin to headings */
+}
+
+/* Form styles */
+.form-group {
+    margin-bottom: 20px; /* Add bottom margin to form groups */
+}
+
+label {
+    display: block;
+    margin-bottom: 5px; /* Add bottom margin to labels */
+}
+
+input[type="text"],
+input[type="number"],
+input[type="submit"],
+button {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+input[type="submit"],
+button {
+    background-color: #007bff; /* Blue submit button */
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+input[type="submit"]:hover,
+button:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+}
+
+/* Table styles */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+th, td {
+    padding: 10px;
+    border: 1px solid #dee2e6;
+}
+
+th {
+    background-color: #007bff;
+    color: white;
+    text-align: left;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    .container {
+        padding: 10px; /* Reduce padding for smaller screens */
+    }
+}

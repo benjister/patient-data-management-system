@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Records</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Patient Records</h1>
+        <form action="/search" method="get">
+            <div class="form-group">
+                <input type="text" name="search" placeholder="Search by Name">
+                <button type="submit">Search</button>
+            </div>
+        </form>
+        <table>
+            <!-- Table headers -->
+            <tr>
+                <th>Name</th>
+                <th>Age</th>
+                <th>Gender</th>
+                <th>Diagnosis</th>
+                <th>Action</th>
+            </tr>
+            <!-- Loop through the patient records and display them -->
+            {% for patient in patients %}
+            <tr>
+                <td>{{ patient[0] }}</td>
+                <td>{{ patient[1] }}</td>
+                <td>{{ patient[2] }}</td>
+                <td>{{ patient[3] }}</td>
+                <td>
+                    <form action="/edit/{{ loop.index }}" method="get">
+                        <input type="submit" value="Edit">
+                    </form>
+                    <form action="/delete/{{ loop.index }}" method="post">
+                        <input type="submit" value="Delete">
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+        <!-- Button to add new patient information -->
+        <button onclick="window.location.href='/patient_form'">Add New Patient Information</button>
+    </div>
+</body>
+</html>

@@ -3,7 +3,7 @@ import csv
 import bcrypt
 
 app = Flask(__name__)
-app.secret_key = 'your_secret_key'
+app.secret_key = 'Passphrase@alx'
 
 users = {
     "admin": {"password": bcrypt.hashpw("password".encode('utf-8'), bcrypt.gensalt()), "role": "admin"},

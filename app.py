@@ -1,30 +1,23 @@
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for
 import csv
-import bcrypt
 
 app = Flask(__name__)
-app.secret_key = 'Passphrase@alx'
 
 users = {
-    "admin": {"password": bcrypt.hashpw("password".encode('utf-8'), bcrypt.gensalt()), "role": "admin"},
-    "user": {"password": bcrypt.hashpw("userpass".encode('utf-8'), bcrypt.gensalt()), "role": "user"}
+    "admin": "password"
 }
 
+# Load patient data from CSV
 def load_patient_data():
-    try:
-        with open('patient_data.csv', mode='r') as f:
-            reader = csv.reader(f)
-            return list(reader)
-    except FileNotFoundError:
-        return []
+    with open('patient_data.csv', mode='r') as f:
+        reader = csv.reader(f)
+        return list(reader)
 
+# Save patient data to CSV
 def save_patient_data(data):
-    try:
-        with open('patient_data.csv', mode='w', newline='') as f:
-            writer = csv.writer(f)
-            writer.writerows(data)
-    except Exception as e:
-        print(f"Error saving data: {e}")
+    with open('patient_data.csv', mode='w', newline='') as f:
+        writer = csv.writer(f)
+        writer.writerows(data)
 
 @app.route('/')
 def index():
@@ -32,6 +25,7 @@ def index():
     message = request.args.get('message')
     return render_template('login.html', error=error, message=message)
 
+# Define the search route
 @app.route('/search')
 def search():
     query = request.args.get('search')
@@ -44,37 +38,26 @@ def search():
 
 @app.route('/patients')
 def patients():
-    if 'username' not in session:
-        return redirect(url_for('index'))
     patient_list = load_patient_data()
     return render_template('patients.html', patients=patient_list)
 
 @app.route('/login', methods=['POST'])
 def login():
     username = request.form['username']
-    password = request.form['password'].encode('utf-8')
-    if username in users and bcrypt.checkpw(password, users[username]['password']):
-        session['username'] = username
-        session['role'] = users[username]['role']
+    password = request.form['password']
+    if username in users and users[username] == password:
         return redirect(url_for('patients'))
     else:
         error = "Invalid username or password. Please try again."
         return redirect(url_for('index', error=error))
 
-@app.route('/logout')
-def logout():
-    session.pop('username', None)
-    session.pop('role', None)
-    return redirect(url_for('index'))
-
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
     if request.method == 'POST':
         username = request.form['username']
-        password = request.form['password'].encode('utf-8')
+        password = request.form['password']
         if username not in users:
-            hashed_password = bcrypt.hashpw(password, bcrypt.gensalt())
-            users[username] = {"password": hashed_password, "role": "user"}
+            users[username] = password
             message = "Successfully signed up! Please log in."
             return redirect(url_for('index', message=message))
         else:
@@ -84,14 +67,10 @@ def signup():
 
 @app.route('/patient_form')
 def patient_form():
-    if 'username' not in session:
-        return redirect(url_for('index'))
     return render_template('index.html')
 
 @app.route('/submit', methods=['POST'])
 def submit():
-    if 'username' not in session:
-        return redirect(url_for('index'))
     if request.method == 'POST':
         name = request.form['name']
         age = request.form['age']
@@ -107,20 +86,16 @@ def submit():
 
 @app.route('/delete/<int:index>', methods=['POST'])
 def delete(index):
-    if 'username' not in session or session['role'] != 'admin':
-        return redirect(url_for('index'))
     patient_list = load_patient_data()
-    del patient_list[index - 1]
+    del patient_list[index - 1]  # Adjust index since Python is zero-based
     save_patient_data(patient_list)
     return redirect(url_for('patients'))
 
 @app.route('/edit/<int:index>', methods=['GET', 'POST'])
 def edit(index):
-    if 'username' not in session:
-        return redirect(url_for('index'))
     if request.method == 'GET':
         patient_list = load_patient_data()
-        patient = patient_list[index - 1]
+        patient = patient_list[index - 1]  # Adjust index since Python is zero-based
         return render_template('edit.html', patient=patient, index=index)
     elif request.method == 'POST':
         name = request.form['name']
@@ -129,20 +104,10 @@ def edit(index):
         diagnosis = request.form['diagnosis']
         
         patient_list = load_patient_data()
-        patient_list[index - 1] = [name, age, gender, diagnosis]
+        patient_list[index - 1] = [name, age, gender, diagnosis]  # Adjust index since Python is zero-based
         save_patient_data(patient_list)
         
         return redirect(url_for('patients'))
-
-@app.route('/export')
-def export():
-    if 'username' not in session:
-        return redirect(url_for('index'))
-    patient_list = load_patient_data()
-    response = make_response('\n'.join([','.join(patient) for patient in patient_list]))
-    response.headers["Content-Disposition"] = "attachment; filename=patient_data.csv"
-    response.headers["Content-Type"] = "text/csv"
-    return response
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -8,6 +8,16 @@
 </head>
 <body>
     <div class="container">
+        <nav>
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/patient_form">Add Patient</a></li>
+                {% if session['username'] %}
+                    <li><a href="/logout">Logout</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+
         <h1>Patient Records</h1>
         <form action="/search" method="get">
             <div class="form-group">
@@ -16,7 +26,6 @@
             </div>
         </form>
         <table>
-            <!-- Table headers -->
             <tr>
                 <th>Name</th>
                 <th>Age</th>
@@ -24,7 +33,6 @@
                 <th>Diagnosis</th>
                 <th>Action</th>
             </tr>
-            <!-- Loop through the patient records and display them -->
             {% for patient in patients %}
             <tr>
                 <td>{{ patient[0] }}</td>
@@ -42,8 +50,8 @@
             </tr>
             {% endfor %}
         </table>
-        <!-- Button to add new patient information -->
         <button onclick="window.location.href='/patient_form'">Add New Patient Information</button>
+        <button onclick="window.location.href='/export'">Export Data</button>
     </div>
 </body>
 </html>

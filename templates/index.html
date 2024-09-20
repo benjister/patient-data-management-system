@@ -4,12 +4,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Patient Data Management</title>
-    <!-- Link to the CSS file -->
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
     <div class="container">
+        <nav>
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/patients">Patient Records</a></li>
+                <li><a href="/patient_form">Add Patient</a></li>
+                {% if session['username'] %}
+                    <li><a href="/logout">Logout</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+
         <h1>Patient Data Entry Form</h1>
+
+        {% if message %}
+            <div class="message">{{ message }}</div>
+        {% endif %}
+        {% if error %}
+            <div class="error">{{ error }}</div>
+        {% endif %}
+
         <form action="/submit" method="post" class="patient-form">
             <div class="form-group">
                 <label for="name">Name:</label>
@@ -35,7 +53,6 @@
                 <input type="submit" value="Submit">
             </div>
         </form>
-        <!-- Button to view patient records -->
         <button onclick="window.location.href='/patients'">Patient Records</button> 
     </div>
 </body>

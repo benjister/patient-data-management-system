@@ -1,23 +1,31 @@
 from flask import Flask, render_template, request, redirect, url_for
 import csv
+import bcrypt
 
 app = Flask(__name__)
 
+# Fake user data (replace with your actual user authentication mechanism)
 users = {
-    "admin": "password"
+    "admin": bcrypt.hashpw("password".encode('utf-8'), bcrypt.gensalt())
 }
 
 # Load patient data from CSV
 def load_patient_data():
-    with open('patient_data.csv', mode='r') as f:
-        reader = csv.reader(f)
-        return list(reader)
+    try:
+        with open('patient_data.csv', mode='r') as f:
+            reader = csv.reader(f)
+            return list(reader)
+    except FileNotFoundError:
+        return []
 
 # Save patient data to CSV
 def save_patient_data(data):
-    with open('patient_data.csv', mode='w', newline='') as f:
-        writer = csv.writer(f)
-        writer.writerows(data)
+    try:
+        with open('patient_data.csv', mode='w', newline='') as f:
+            writer = csv.writer(f)
+            writer.writerows(data)
+    except Exception as e:
+        print(f"Error saving data: {e}")
 
 @app.route('/')
 def index():
@@ -25,7 +33,6 @@ def index():
     message = request.args.get('message')
     return render_template('login.html', error=error, message=message)
 
-# Define the search route
 @app.route('/search')
 def search():
     query = request.args.get('search')
@@ -44,8 +51,8 @@ def patients():
 @app.route('/login', methods=['POST'])
 def login():
     username = request.form['username']
-    password = request.form['password']
-    if username in users and users[username] == password:
+    password = request.form['password'].encode('utf-8')
+    if username in users and bcrypt.checkpw(password, users[username]):
         return redirect(url_for('patients'))
     else:
         error = "Invalid username or password. Please try again."
@@ -55,9 +62,10 @@ def login():
 def signup():
     if request.method == 'POST':
         username = request.form['username']
-        password = request.form['password']
+        password = request.form['password'].encode('utf-8')
         if username not in users:
-            users[username] = password
+            hashed_password = bcrypt.hashpw(password, bcrypt.gensalt())
+            users[username] = hashed_password
             message = "Successfully signed up! Please log in."
             return redirect(url_for('index', message=message))
         else:
